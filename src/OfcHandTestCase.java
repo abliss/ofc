@@ -113,7 +113,7 @@ public abstract class OfcHandTestCase extends TestCase {
 
 	public void testBackMustBeatMiddle() {
 		foulHand1();
-		
+		assertTrue(hand1.isComplete());
 		assertTrue(hand1.isFouled());
 	}
 	
