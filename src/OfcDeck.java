@@ -7,7 +7,8 @@ import com.google.common.collect.Lists;
 public class OfcDeck {
 
 	private long cardMask;
-	
+	public static final int FULL_SIZE = 52;
+ 
 	public OfcDeck() {
 		cardMask = 0L;
 	}
@@ -17,12 +18,13 @@ public class OfcDeck {
 		this.cardMask = cardMask;
 	}
 	
-	public void initialize() {
+	public OfcDeck initialize() {
 		for (String rank : Lists.newArrayList("2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A")) {
 			for (String suit : Lists.newArrayList("c", "d", "h", "s")) {
 				cardMask |= Deck.parseCardMask(rank + suit);
 			}
 		}
+		return this;
 	}
 
 	public long getMask() {
@@ -35,7 +37,8 @@ public class OfcDeck {
 
 	public long withoutCard(long cardBit) {
 		if ((cardMask & cardBit) == 0) {
-			throw new IllegalArgumentException("Card not in deck");
+			throw new IllegalArgumentException(
+				"Card " + Deck.cardMaskString(cardBit) + " not in deck");
 		}
 
 		return cardMask ^ cardBit;
@@ -76,5 +79,13 @@ public class OfcDeck {
 	@Override
 	public String toString() {
 		return Deck.cardMaskString(cardMask);
+	}
+	
+	public static OfcDeck fromString(String deckString) {
+		return new OfcDeck(Deck.parseCardMask(deckString));
+	}
+
+	public int getSize() {
+		return Long.bitCount(cardMask);
 	}
 }

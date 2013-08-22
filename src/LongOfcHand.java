@@ -47,22 +47,6 @@ public class LongOfcHand extends CachedValueOfcHand {
 	}
 
 	@Override
-	public long getBackMask() {
-		return back;
-	}
-	
-	@Override
-
-	public long getMiddleMask() {
-		return middle;
-	}
-	
-	@Override
-	public long getFrontMask() {
-		return front;
-	}
-
-	@Override
 	public void addBack(OfcCard card) {
 		if (getBackSize() >= BACK_SIZE) {
 			throw new IllegalStateException("Back already full");
@@ -191,52 +175,45 @@ public class LongOfcHand extends CachedValueOfcHand {
 
 	@Override
 	public String toKeyString() {
-		StringBuilder sb = new StringBuilder();
-/*
-		sb.append(Strings.padStart(Long.toHexString(front), 16, '0'));
-		sb.append("-");
-		sb.append(Strings.padStart(Long.toHexString(middle), 16, '0'));
-		sb.append("-");
-		sb.append(Strings.padStart(Long.toHexString(back), 16, '0'));
-*/
 		if (willBeFouled()) {
-			long combined = front | middle | back;
-			sb.append(Deck.cardMaskString(combined, ""));
+			return new FouledOfcHand(this).toKeyString();
 		} else {
+			StringBuilder sb = new StringBuilder();
 			sb.append(Deck.cardMaskString(front, ""));
 			sb.append("-");
 			sb.append(Deck.cardMaskString(middle, ""));
 			sb.append("-");
 			sb.append(Deck.cardMaskString(back, ""));
+			return sb.toString();
 		}
-
-		
-		
-		return sb.toString();
 	}
 
-	public static LongOfcHand fromKeyString(String s) {
+	public static OfcHand fromKeyString(String s) {
 		String[] hands = s.split("-");
-		if (hands.length != 3) {
+		if (hands.length == 4) {
+			// fouled hand
+			return FouledOfcHand.fromKeyString(s);
+		} else if (hands.length == 3) {
+			LongOfcHand hand = new LongOfcHand();
+			int index = 0;
+			while (index < hands[0].length()) {
+				hand.addFront(new OfcCard(hands[0].substring(index, index + 2)));
+				index += 2;
+			}
+			index = 0;
+			while (index < hands[1].length()) {
+				hand.addMiddle(new OfcCard(hands[1].substring(index, index + 2)));
+				index += 2;
+			}
+			index = 0;
+			while (index < hands[2].length()) {
+				hand.addBack(new OfcCard(hands[2].substring(index, index + 2)));
+				index += 2;
+			}
+			return hand;
+		} else {
 			throw new IllegalArgumentException("format incorrect");
 		}
-		LongOfcHand hand = new LongOfcHand();
-		int index = 0;
-		while (index < hands[0].length()) {
-			hand.addFront(new OfcCard(hands[0].substring(index, index + 2)));
-			index += 2;
-		}
-		index = 0;
-		while (index < hands[1].length()) {
-			hand.addMiddle(new OfcCard(hands[1].substring(index, index + 2)));
-			index += 2;
-		}
-		index = 0;
-		while (index < hands[2].length()) {
-			hand.addBack(new OfcCard(hands[2].substring(index, index + 2)));
-			index += 2;
-		}
-		return hand;
 	}
 	
 	private String maskToString(long mask) {
@@ -255,6 +232,7 @@ public class LongOfcHand extends CachedValueOfcHand {
 		return hand;
 	}
 	
+	@Override
 	public void setHand(String handString, OfcDeck deck) {
 		String[] hands = handString.split("/");
 		if (hands.length != 3) {

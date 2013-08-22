@@ -57,7 +57,28 @@ public class LongOfcHandTest extends CachedValueOfcHandTestCase {
 		addBack1("2h");
 		
 		String keyString = cHand1.toKeyString();
-		LongOfcHand from = LongOfcHand.fromKeyString(keyString);
+		OfcHand from = LongOfcHand.fromKeyString(keyString);
 		assertEquals(cHand1, from);
+	}
+	public void testKeyStringFoul() {
+		addFront1("2c");
+		addFront1("8c");
+		addFront1("8d");
+		
+		addMiddle1("7c");
+		addMiddle1("7h");
+		addMiddle1("Ac");
+		addMiddle1("Kc");
+		addMiddle1("Qc");
+		
+		addBack1("Kh");
+		addBack1("Ah");
+		addBack1("Qh");
+		addBack1("2h");
+		
+		String keyString = cHand1.toKeyString();
+		OfcHand from = LongOfcHand.fromKeyString(keyString);
+		String keyString2 = from.toKeyString();
+		assertEquals(keyString, keyString2);
 	}
 }

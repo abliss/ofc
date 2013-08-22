@@ -144,8 +144,8 @@ public class GameState {
 		
 		// Don't permit any dead cards.  We'd like game states to be normalized so that any 2 of {player1, player2, deck}
 		// define the state.
-		if (FULL_DECK_MASK != (player1.getBackMask() ^ player1.getMiddleMask() ^ player1.getFrontMask() ^
-				player2.getBackMask() ^ player2.getMiddleMask() ^ player2.getFrontMask() ^ deck.getMask())) {
+		if (OfcDeck.FULL_SIZE != (player1.getBackSize() + player1.getMiddleSize() + player1.getFrontSize() +
+				player2.getBackSize() + player2.getMiddleSize() + player2.getFrontSize() + deck.getSize())) {
 			throw new IllegalStateException("Hands + deck != full deck");
 		}
 	}
@@ -311,10 +311,8 @@ public class GameState {
 				OfcHand p2Hand = player2.generateOnlyHand(p2Card);
 				count++;
 
-				int index = 0;
-				for (Scorers.Scorer scorer : scorers) {
-					sums[index] += scorer.score(p1Hand, p2Hand);
-					index++;
+				for (int index = sums.length - 1; index >= 0 ; index--) {
+					sums[index] += scorers.get(index).score(p1Hand, p2Hand);
 				}
 			}
 		}
@@ -386,14 +384,15 @@ public class GameState {
 		}
 		return values;
 	}
-		
-	private String toFileString() {
+	
+	@VisibleForTesting	
+	String toFileString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getStreet());
-		sb.append(" ");
 		sb.append(player1.toKeyString());
 		sb.append(" ");
 		sb.append(player2.toKeyString());
+		sb.append(" ");
+		sb.append(deck.toString().replaceAll(" ", "-"));
 		
 		return sb.toString();
 	}
@@ -402,22 +401,16 @@ public class GameState {
 	static GameState fromFileString(String fileString) {
 		String[] splitString = fileString.split(" ");
 
-		OfcHand p1 = LongOfcHand.fromKeyString(splitString[1]);
-		OfcHand p2 = LongOfcHand.fromKeyString(splitString[2]);
-		
-		return new GameState(p1, p2, new OfcDeck(deriveDeck(p1, p2)));
+		OfcHand p1 = LongOfcHand.fromKeyString(splitString[0]);
+		OfcHand p2 = LongOfcHand.fromKeyString(splitString[1]);
+		OfcDeck deck = OfcDeck.fromString(splitString[2].replaceAll("-", " "));
+		return new GameState(p1, p2, deck);
 	}
 	
 	@VisibleForTesting
 	static double getValueFromFileString(String fileString) {
 		String[] splitString = fileString.split(" ");
 		return Double.parseDouble(splitString[3]);
-	}
-	
-	@VisibleForTesting
-	static long deriveDeck(OfcHand p1, OfcHand p2) {
-		return ~(~FULL_DECK_MASK | p1.getFrontMask() | p1.getMiddleMask() | p1.getBackMask()
-					| p2.getFrontMask() | p2.getMiddleMask() | p2.getBackMask());
 	}
 	
 	public double getStreet() {

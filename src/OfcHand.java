@@ -57,11 +57,6 @@ public interface OfcHand {
 	long getMiddleRank();
 	long getBackRank();
 
-	// These really are just for LongOfcHand and don't belong in the interface
-	long getBackMask();
-	long getMiddleMask();
-	long getFrontMask();
-	
 	boolean isComplete();
 
 	// use for pruning the search space

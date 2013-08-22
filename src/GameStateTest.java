@@ -9,38 +9,16 @@ public class GameStateTest extends TestCase {
 
 	
 	public void testFileString() {
-		String fileString = "11.5 6h2h-Js9s8h-KsKdTsTc2s Td2c2d-KcQd7s-AsAdAhJdJh -1.7013370235005392";
+		OfcDeck deck = new OfcDeck().initialize();
 		OfcHand hand1 = new LongOfcHand();
-		hand1.addFront(new OfcCard("6h"));
-		hand1.addFront(new OfcCard("2h"));
-
-		hand1.addMiddle(new OfcCard("Js"));
-		hand1.addMiddle(new OfcCard("9s"));
-		hand1.addMiddle(new OfcCard("8h"));
-		
-		hand1.addBack(new OfcCard("Ks"));
-		hand1.addBack(new OfcCard("Kd"));
-		hand1.addBack(new OfcCard("Ts"));
-		hand1.addBack(new OfcCard("Tc"));
-		hand1.addBack(new OfcCard("2s"));
-
+		hand1.setHand("6h2h/Js9s8h/KsKdTsTc2s", deck);
 		OfcHand hand2 = new LongOfcHand();
-		hand2.addFront(new OfcCard("Td"));
-		hand2.addFront(new OfcCard("2c"));
-		hand2.addFront(new OfcCard("2d"));
-		
-		hand2.addMiddle(new OfcCard("Kc"));
-		hand2.addMiddle(new OfcCard("Qd"));
-		hand2.addMiddle(new OfcCard("7s"));
-
-		hand2.addBack(new OfcCard("As"));
-		hand2.addBack(new OfcCard("Ad"));
-		hand2.addBack(new OfcCard("Ah"));
-		hand2.addBack(new OfcCard("Jd"));
-		hand2.addBack(new OfcCard("Jh"));
-		
-		GameState state1 = new GameState(hand1, hand2, new OfcDeck(GameState.deriveDeck(hand1, hand2)));
-		GameState state2 = GameState.fromFileString(fileString);
+		hand2.setHand("Td2c2d/KcQd7s/AsAdAhJdJh", deck);
+		GameState state1 = new GameState(hand1, hand2, deck);
+		String fileString1 = state1.toFileString();
+		String fileString2 = "6h2h-Js9s8h-KsKdTsTc2s Td2c2d-KcQd7s-AsAdAhJdJh Ac-Kh-Qs-Qc-Qh-Jc-Th-9c-9d-9h-8s-8c-8d-7c-7d-7h-6s-6c-6d-5s-5c-5d-5h-4s-4c-4d-4h-3s-3c-3d-3h";
+		assertEquals(fileString1, fileString2);
+		GameState state2 = GameState.fromFileString(fileString1);
 		
 		assertEquals(state1, state2);
 	}
