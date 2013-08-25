@@ -37,6 +37,10 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	private static final int OFF_RANK = 4;
 	private static final long MASK_RANK = 0xf;
 
+	// Cache for subhand-mask -> eval-result. Ignores suit.
+	static final long[] EVAL_CACHE =
+		new long[(int)(MASK_MIDDLE >>> OFF_UNSUITED)];
+
 	public LongOfcHand2() {
 		board = 0;
 	}
@@ -262,11 +266,18 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	public long getFrontRank() {
 		if (frontValue == UNSET) {
 			long frontMask = getFrontMask();
+			int handInt = (int) (frontMask >> OFF_UNSUITED);
+			long cached = EVAL_CACHE[handInt];
+			if (cached > 0) {
+				return cached;
+			}
+
 			if (countSize(frontMask) != FRONT_SIZE) {
 				throw new IllegalStateException("Front not complete");
 			}
 			int[] ranks = getRanks(frontMask, FRONT_SIZE);
 			frontValue = StupidEval.eval3(ranks);
+			EVAL_CACHE[handInt] = frontValue;
 		}
 		return frontValue;
 	}
@@ -275,12 +286,18 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	public long getMiddleRank() {
 		if (middleValue == UNSET) {
 			long middleMask = getMiddleMask();
+			int handInt = (int) (middleMask >> OFF_UNSUITED);
+			long cached = EVAL_CACHE[handInt];
+			if (cached > 0) {
+				return cached;
+			}
 			if (countSize(middleMask) != MIDDLE_SIZE) {
 				throw new IllegalStateException("Middle not complete");
 			}
 			int[] ranks = getRanks(middleMask, MIDDLE_SIZE);
 			boolean isFlush = isSuited(middleMask);
 			middleValue = StupidEval.eval(ranks, isFlush);
+			EVAL_CACHE[handInt] = middleValue;
 		}
 		return middleValue;
 	}
@@ -289,12 +306,18 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	public long getBackRank() {
 		if (backValue == UNSET) {
 			long backMask = getBackMask();
+			int handInt = (int) (backMask >> OFF_UNSUITED);
+			long cached = EVAL_CACHE[handInt];
+			if (cached > 0) {
+				return cached;
+			}
 			if (countSize(backMask) != BACK_SIZE) {
 				throw new IllegalStateException("Back not complete");
 			}
 			int[] ranks = getRanks(backMask, BACK_SIZE);
 			boolean isFlush = isSuited(backMask);
 			backValue = StupidEval.eval(ranks, isFlush);
+			EVAL_CACHE[handInt] = backValue;
 		}
 		return backValue;
 	}
