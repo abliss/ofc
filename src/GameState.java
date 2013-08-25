@@ -401,8 +401,8 @@ public class GameState {
 	static GameState fromFileString(String fileString) {
 		String[] splitString = fileString.split(" ");
 
-		OfcHand p1 = LongOfcHand.fromKeyString(splitString[0]);
-		OfcHand p2 = LongOfcHand.fromKeyString(splitString[1]);
+		OfcHand p1 = LongOfcHand2.fromKeyString(splitString[0]);
+		OfcHand p2 = LongOfcHand2.fromKeyString(splitString[1]);
 		OfcDeck deck = OfcDeck.fromString(splitString[2].replaceAll("-", " "));
 		return new GameState(p1, p2, deck);
 	}

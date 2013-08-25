@@ -7,9 +7,9 @@ public class OfcSolver {
 		OfcDeck deck = new OfcDeck();
 		deck.initialize();
 		
-		OfcHand player1 = new LongOfcHand();
+		OfcHand player1 = new LongOfcHand2();
 		
-		OfcHand player2 = new LongOfcHand();
+		OfcHand player2 = new LongOfcHand2();
 //		player1.setHand("/8h4c/AsKsQs", deck);
 //		player2.setHand("Td/JdJh/QdQc", deck);
 	

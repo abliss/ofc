@@ -10,20 +10,20 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	// 2 bits  : suit value 0-3 (if the hand is suited), 0 otherwise
 	// 1 bit   : 0 if the hand is suited (or empty), 1 otherwise
 	// 4n bits : Rank value 1-13, nonincreasing order, 0 if empty
-	// the board packs in Front (22 bits), then Middle (22), then Back (15).
+	// the board packs in Back (15 bits), then Middle (23), then Front (23).
 	// Note that an empty board is encoded as 0.
 	long board;
 
 	// Packing the subhands into the board...
 	// bitshift offsets for the last bit in the hands
+	// and masks for the hands, once shifted.
+	// Includes suit bits and the unsuited bit.
 	private static final int OFF_FRONT = 0;
-	private static final int OFF_MIDDLE = 15;
-	private static final int OFF_BACK = 22 + 15;
-	// Masks for the hands, once shifted.
-	// Does not include suit bits, only the suited-or-not bit.
-	private static final long MASK_FRONT = 0x1fff;
-	private static final long MASK_MIDDLE = 0x1fffff;
-	private static final long MASK_BACK = 0x1fffff;
+	private static final long MASK_FRONT = 0x7fff;
+	private static final int OFF_MIDDLE = 4*3+3;
+	private static final long MASK_MIDDLE = 0x7fffff;
+	private static final int OFF_BACK = OFF_MIDDLE + 4*5+3;
+	private static final long MASK_BACK = 0x7fffff;
 
 	// Within a subhand...
 	// Offset/Mask to pull out the suit
@@ -181,7 +181,10 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 
 	@VisibleForTesting
 	long getBackMask() {
-		return (board >>> OFF_BACK) & MASK_BACK;
+		long back = board >>> OFF_BACK;
+		back = back & MASK_BACK;
+		return back;
+		//return (board >>> OFF_BACK) & MASK_BACK;
 	}
 
 	@VisibleForTesting
