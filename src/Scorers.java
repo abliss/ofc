@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class Scorers {
+	public static final boolean DEBUG = false;
+
 	private static final Map<Long, Integer> OLD_BACK_ROYALTY_MAP = ImmutableMap
 			.<Long, Integer> builder()
 			.put(StupidEval.STRAIGHT, 2)
@@ -31,7 +33,7 @@ public class Scorers {
 		/**
 		 * Return the value of p1's hand scored against p2
 		 */
-		int score(OfcHand first, OfcHand second);
+		int score(CompleteOfcHand first, CompleteOfcHand second);
 
 		String getCacheFile();
 
@@ -41,11 +43,11 @@ public class Scorers {
 		/**
 		 * Return 0 if not a FL scorer
 		 */
-		int getFantasylandValue(OfcHand hand);
-		int getRoyaltyValue(OfcHand hand);
-		int getFrontValue(OfcHand hand);
-		int getMiddleValue(OfcHand hand);
-		int getBackValue(OfcHand hand);
+		int getFantasylandValue(CompleteOfcHand hand);
+		int getRoyaltyValue(CompleteOfcHand hand);
+		int getFrontValue(CompleteOfcHand hand);
+		int getMiddleValue(CompleteOfcHand hand);
+		int getBackValue(CompleteOfcHand hand);
 	}
 	
 	private static abstract class AbstractScorer implements Scorer {
@@ -57,7 +59,7 @@ public class Scorers {
 			return getCacheFile();
 		}
 
-		public final int getBackValue(OfcHand hand) {
+		public final int getBackValue(CompleteOfcHand hand) {
 			Map<Long, Integer> backRoyaltyMap = getBackRoyaltyMap();
 
 			// Stupid integer division hack to zero out all the insignificant
@@ -88,7 +90,7 @@ public class Scorers {
 			return 0;
 		}
 		
-		public final int getMiddleValue(OfcHand hand) {
+		public final int getMiddleValue(CompleteOfcHand hand) {
 			Map<Long, Integer> backRoyaltyMap = getBackRoyaltyMap();
 
 			// Stupid integer division hack to zero out all the insignificant
@@ -119,7 +121,7 @@ public class Scorers {
 			return 0;
 		}
 
-		public final int getFrontValue(OfcHand hand) {
+		public final int getFrontValue(CompleteOfcHand hand) {
 			long rank = hand.getFrontRank();
 			if (rank >= StupidEval.TRIPS) {
 				rank -= StupidEval.TRIPS;
@@ -142,10 +144,7 @@ public class Scorers {
 			return 0;
 		}
 		
-		public final int getRoyaltyValue(OfcHand hand) {
-			if (!hand.isComplete()) {
-				throw new IllegalArgumentException("Hand not complete");
-			}
+		public final int getRoyaltyValue(CompleteOfcHand hand) {
 			if (hand.isFouled()) {
 				return 0;
 			}
@@ -153,17 +152,11 @@ public class Scorers {
 			return getBackValue(hand) + getMiddleValue(hand) + getFrontValue(hand);
 		}
 
-		protected final boolean isFantasyland(OfcHand hand) {
+		protected final boolean isFantasyland(CompleteOfcHand hand) {
 			return !hand.isFouled() && hand.getFrontRank() >= StupidEval.FANTASYLAND_THRESHOLD;
 		}
-
-		public final int score(OfcHand first, OfcHand second) {
-			if (!first.isComplete() || !second.isComplete()) {
-				System.out.println(first);
-				System.out.println(second);
-				throw new IllegalArgumentException(
-						"Can only compare complete hands");
-			}
+		
+		public final int score(CompleteOfcHand first, CompleteOfcHand second) {
 			if (first.isFouled()) {
 				if (second.isFouled()) {
 					return 0;
@@ -215,7 +208,7 @@ public class Scorers {
 		}
 
 		@Override
-		public int getFantasylandValue(OfcHand hand) {
+		public int getFantasylandValue(CompleteOfcHand hand) {
 			return 0;
 		}
 
@@ -227,7 +220,7 @@ public class Scorers {
 
 	static final class OldFantasylandScorer extends OldScorer {
 		@Override
-		public int getFantasylandValue(OfcHand hand) {
+		public int getFantasylandValue(CompleteOfcHand hand) {
 			if (isFantasyland(hand)) {
 				return FANTASYLAND_VALUE;
 			}
@@ -246,7 +239,7 @@ public class Scorers {
 		}
 
 		@Override
-		public int getFantasylandValue(OfcHand hand) {
+		public int getFantasylandValue(CompleteOfcHand hand) {
 			return 0;
 		}
 
@@ -258,7 +251,7 @@ public class Scorers {
 
 	static final class NewFantasylandScorer extends NewScorer {
 		@Override
-		public int getFantasylandValue(OfcHand hand) {
+		public int getFantasylandValue(CompleteOfcHand hand) {
 			if (isFantasyland(hand)) {
 				return FANTASYLAND_VALUE;
 			}
@@ -281,10 +274,10 @@ public class Scorers {
 	private static final List<Scorer> NEW_SCORERS = ImmutableList
 			.<Scorer>of(new NewScorer(), new NewFantasylandScorer());
 	
-	private static final List<Scorer> NEW_FL_SCORER = ImmutableList
-			.<Scorer>of(new NewFantasylandScorer());
+	private static final Scorer[] NEW_FL_SCORER = new Scorer[] {
+		new NewFantasylandScorer()};
 	
-	public static List<Scorer> getScorers() {
+	public static Scorer[] getScorers() {
 		return NEW_FL_SCORER;
 	}
 }

@@ -32,7 +32,7 @@ public class OfcDeck {
 	}
 		
 	public long withoutCard(OfcCard card) {
-		return withoutCard(card.getMask());
+		return withoutCard(card.mask);
 	}
 
 	public long withoutCard(long cardBit) {
@@ -50,7 +50,7 @@ public class OfcDeck {
 		return card;
 	}
 	
-	public List<OfcCard> asList() {
+	public OfcCard[] asList() {
 		return CardSetUtils.asCards(cardMask);
 	}
 	

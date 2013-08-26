@@ -1,14 +1,18 @@
 import junit.framework.TestCase;
 
-
 public abstract class OfcHandTestCase extends TestCase {
 
 	protected OfcHand hand1;
 	protected OfcHand hand2;
+	// really only here to allow the use of setHand()
+	protected OfcDeck deck;
+	protected CompleteOfcHand ch1;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		initHands();
+		deck = new OfcDeck();
+		deck.initialize();
 	}
 	
 	protected void tearDown() throws Exception {
@@ -82,6 +86,107 @@ public abstract class OfcHandTestCase extends TestCase {
 		}
 	}
 	
+	public void testAddSameFrontCard() {
+		addFront1("As");
+		try {
+			addFront1("As");
+			fail();
+		} catch (Exception expected) {
+		}
+	}
+
+	public void testAddSameMiddleCard() {
+		addMiddle1("As");
+		try {
+			addMiddle1("As");
+			fail();
+		} catch (Exception expected) {
+		}
+	}
+	
+	public void testAddSameBackCard() {
+		addBack1("As");
+		try {
+			addBack1("As");
+			fail();
+		} catch (Exception expected) {
+		}
+	}
+	
+	public void testFrontSize() {
+		assertEquals(0, hand1.getFrontSize());
+		addFront1("As");
+		assertEquals(1, hand1.getFrontSize());
+		addFront1("Ks");
+		assertEquals(2, hand1.getFrontSize());
+		addFront1("Qs");
+		assertEquals(3, hand1.getFrontSize());
+	}
+	
+	public void testMiddleSize() {
+		assertEquals(0, hand1.getMiddleSize());
+		addMiddle1("As");
+		assertEquals(1, hand1.getMiddleSize());
+		addMiddle1("Ks");
+		assertEquals(2, hand1.getMiddleSize());
+		addMiddle1("Qs");
+		assertEquals(3, hand1.getMiddleSize());
+		addMiddle1("Js");
+		assertEquals(4, hand1.getMiddleSize());
+		addMiddle1("2s");
+		assertEquals(5, hand1.getMiddleSize());
+	}
+	
+	public void testBackSize() {
+		assertEquals(0, hand1.getBackSize());
+		addBack1("As");
+		assertEquals(1, hand1.getBackSize());
+		addBack1("Ks");
+		assertEquals(2, hand1.getBackSize());
+		addBack1("Qs");
+		assertEquals(3, hand1.getBackSize());
+		addBack1("Js");
+		assertEquals(4, hand1.getBackSize());
+		addBack1("2s");
+		assertEquals(5, hand1.getBackSize());
+	}
+
+	public void testGetStreet() {
+		// Okay, so 0-5 shouldn't even be possible.  Whatever.
+		assertEquals(1, hand1.getStreet());
+	
+		addFront1("As");
+		assertEquals(2, hand1.getStreet());
+		addFront1("Ks");
+		assertEquals(3, hand1.getStreet());
+		addFront1("Qs");
+		assertEquals(4, hand1.getStreet());
+
+		addMiddle1("Ac");
+		assertEquals(5, hand1.getStreet());
+		addMiddle1("Kc");
+		assertEquals(6, hand1.getStreet());
+		addMiddle1("Qc");
+		assertEquals(7, hand1.getStreet());
+		addMiddle1("Jc");
+		assertEquals(8, hand1.getStreet());
+		addMiddle1("9c");
+		assertEquals(9, hand1.getStreet());
+
+		addBack1("Ah");
+		assertEquals(10, hand1.getStreet());
+		addBack1("Kh");
+		assertEquals(11, hand1.getStreet());
+		addBack1("Qh");
+		assertEquals(12, hand1.getStreet());
+		addBack1("Jh");
+		assertEquals(13, hand1.getStreet());
+
+		// This doesn't really mean anything
+		addBack1("Th");
+		assertEquals(14, hand1.getStreet());
+	}
+	
 	public void testIsComplete() {
 		hand1.addFront(new OfcCard("As"));
 		assertTrue(!hand1.isComplete());
@@ -111,21 +216,24 @@ public abstract class OfcHandTestCase extends TestCase {
 		assertTrue(hand1.isComplete());
 	}
 
+	// TODO: find out if this is actually true.  Signs point to no
 	public void testBackMustBeatMiddle() {
 		foulHand1();
-		assertTrue(hand1.isComplete());
-		assertTrue(hand1.isFouled());
+		assertTrue(ch1.isFouled());
+	}
+	
+	public void testMiddleMustBeatFront() {
+		ch1 = LongCompleteOfcHand.createComplete("AdAsKd/AhAcQsJsTs/2c2d2h2s3h");
+		assertTrue(ch1.isFouled());
+	}
+	
+	public void testMiddleCanOutkickFront() {
+		ch1 = LongCompleteOfcHand.createComplete("AdAsKd/AhAcKs3d2d/4h4c4d4s3h");
+		assertTrue(!ch1.isFouled());
 	}
 	
 	public void testToKeyStringDoesNotMutate() {
-		addFront1("Ac");
-		addFront1("Ad");
-		addFront1("As");
-		addMiddle1("Kd");
-		addMiddle1("2c");
-		addMiddle1("3c");
-		addMiddle1("4c");
-		addMiddle1("5c");
+		hand1.setHand("AcAdAs/Kd2c3c4c5c/", deck);
 		
 		OfcHand copy = hand1.copy();
 		assertEquals(copy, hand1);
@@ -140,21 +248,7 @@ public abstract class OfcHandTestCase extends TestCase {
 
 	// TODO: poorly named, but need a lot more tests around fouling anyways
 	protected void foulHand1() {
-		addFront1("2c");
-		addFront1("3c");
-		addFront1("4c");
-		
-		addMiddle1("Ad");
-		addMiddle1("Kd");
-		addMiddle1("4d");
-		addMiddle1("3d");
-		addMiddle1("2d");
-		
-		addBack1("As");
-		addBack1("Ks");
-		addBack1("4s");
-		addBack1("3s");
-		addBack1("2s");
+		ch1 = LongCompleteOfcHand.createComplete("2c3c4c/AdKd4d3d2d/AsKs4s3s2s");
 	}
 	
 	// too lazy to type

@@ -5,7 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class OfcCard {
 
 	// One bit should be set, as defined in Deck
-	private long mask;
+	public final long mask;
 	
 	public OfcCard(long mask) {
 		if (Long.bitCount(mask) != 1) {
@@ -72,11 +72,6 @@ public class OfcCard {
 		}
 	}
 
-	public long getMask() {
-		return mask;
-	}
-	
-	
 	public String toString() {
 		return Deck.cardMaskString(mask);
 	}

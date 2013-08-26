@@ -17,8 +17,12 @@ public class StupidEval {
 
 	// public because OfcHand uses this.  So dumb.
 	public static final long PAIR_CONSTANT =             10000000000000L;
-	private static final long KICKER_START_MULTIPLIER =     100000000000L;
-	private static final long KICKER_DIVISOR = 100L;
+	private static final long[] KICKER_MULTIPLIERS =
+		new long[] {100000000000L,
+					1000000000L,
+					10000000L,
+					100000L,
+					1000L};
 
 	// TODO: so very very sketchy
 	public static final long FANTASYLAND_THRESHOLD =
@@ -185,19 +189,14 @@ public class StupidEval {
 
 	private static long countKickers(int[] ranks, int... indices) {
 		long count = 0;
-		long multiplier = KICKER_START_MULTIPLIER;
-		for (int i : indices) {
-			count += ranks[i] * multiplier;
-			multiplier /= KICKER_DIVISOR;
+		for (int i = 0; i < indices.length; i++) {
+			count += ranks[indices[i]] * KICKER_MULTIPLIERS[i];
 			if (count > PAIR_CONSTANT) {
 				System.out.println(Arrays.toString(ranks));
 				System.out.println(Arrays.toString(indices));
 				System.out.println(count);
 				System.out.println(Long.MAX_VALUE);
 				throw new IllegalStateException("kickered imo");
-			}
-			if (multiplier < 2) {
-				throw new IllegalStateException("too many kickers");
 			}
 		}
 		return count;

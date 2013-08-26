@@ -21,7 +21,7 @@ public class OfcSolver {
 
 		long timestamp = System.currentTimeMillis();	
 		System.out.println(gs.getValue(Scorers.getScorers(), true));
-		System.out.println((System.currentTimeMillis() - timestamp) / 1000 + " seconds");
+		System.out.println((System.currentTimeMillis() - timestamp) + " ms");
 		gs.shutdown();
 	}
 	

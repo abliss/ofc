@@ -47,7 +47,7 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	private LongOfcHand2(long board) {
 		this.board = board;
 	}	
-	private LongOfcHand2(LongOfcHand2 source) {
+	protected LongOfcHand2(LongOfcHand2 source) {
 		super(source);
 		this.board = source.board;
 	}
@@ -253,16 +253,6 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	}
 
 	@Override
-	public boolean isFouled() {
-		if (!isComplete()) {
-			throw new IllegalStateException("Hand not complete");
-		}
-		// TODO: Be damn sure about this.  Making an assumption that when the hand is complete, willBeFouled is always populated
-		// via the completeXXX methods
-		return willBeFouled;
-	}
-
-	@Override
 	public long getFrontRank() {
 		if (frontValue == UNSET) {
 			long frontMask = getFrontMask();
@@ -330,7 +320,7 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	@Override
 	public String toKeyString() {
 		if (willBeFouled()) {
-			return new FouledOfcHand(this).toKeyString();
+			//XXX return new FouledOfcHand(this).toKeyString();
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(board);
@@ -340,7 +330,7 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	public static OfcHand fromKeyString(String s) {
 		if (s.startsWith("F")) {
 			// Fouled hand.
-			return FouledOfcHand.fromKeyString(s);
+			//XXX return FouledOfcHand.fromKeyString(s);
 		}
 		return new LongOfcHand2(Long.parseLong(s));
 	}
@@ -371,6 +361,11 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 			deck.removeCard(cardString);
 			index += 2;
 		}
+	}
+
+	@Override
+	public CompleteOfcHand generateOnlyHand(OfcCard card) {
+		return new LongCompleteOfcHand2(this, card);
 	}
 	
 	@Override

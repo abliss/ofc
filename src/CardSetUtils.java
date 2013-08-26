@@ -35,13 +35,14 @@ public class CardSetUtils {
 		}
 	}
 
-	public static List<OfcCard> asCards(long mask) {
-		List<OfcCard> cards = Lists.newArrayListWithCapacity(Long.bitCount(mask));
+	public static OfcCard[] asCards(long mask) {
+		OfcCard[] cards = new OfcCard[Long.bitCount(mask)];
+		int i = 0;
 		for (int r = Deck.RANK_ACE; r >= 0; r--) {	
 			for (int s = Deck.SUIT_COUNT - 1; s >= 0; s--) {
 				long m = cardMasks[r][s];
 				if ((mask & m) != 0) {
-					cards.add(new OfcCard(m));
+					cards[i++] = new OfcCard(m);
 		        }
 			}
 		}
