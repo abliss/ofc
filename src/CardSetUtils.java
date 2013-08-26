@@ -7,13 +7,17 @@ import com.google.common.collect.Lists;
 
 public class CardSetUtils {
 	// Cache of cardMask by rank and suit
-	private static long[][] cardMasks;
-	
+	private static final long[][] CARD_MASKS;
+	private static final OfcCard[][] CARDS;
+
 	static {
-		cardMasks = new long[13][4];
+		CARD_MASKS = new long[13][4];
+		CARDS = new OfcCard[13][4];
 		for (int r = Deck.RANK_ACE; r >= 0; r--) {	
 			for (int s = Deck.SUIT_COUNT - 1; s >= 0; s--) {
-				cardMasks[r][s] = Deck.createCardMask(r, s);
+				long mask = Deck.createCardMask(r, s);
+				CARD_MASKS[r][s] = mask;
+				CARDS[r][s] = new OfcCard(mask);
 			}
 		}
 	}
@@ -25,7 +29,7 @@ public class CardSetUtils {
 		int index = 0;
 		for (int r = Deck.RANK_ACE; r >= 0; r--) {	
 			for (int s = Deck.SUIT_COUNT - 1; s >= 0; s--) {
-				long m = cardMasks[r][s];
+				long m = CARD_MASKS[r][s];
 				if ((mask & m) != 0) {
 					ranks[index] = r;
 					suits[index] = s;
@@ -40,9 +44,9 @@ public class CardSetUtils {
 		int i = 0;
 		for (int r = Deck.RANK_ACE; r >= 0; r--) {	
 			for (int s = Deck.SUIT_COUNT - 1; s >= 0; s--) {
-				long m = cardMasks[r][s];
+				long m = CARD_MASKS[r][s];
 				if ((mask & m) != 0) {
-					cards[i++] = new OfcCard(m);
+					cards[i++] = CARDS[r][s];
 		        }
 			}
 		}
