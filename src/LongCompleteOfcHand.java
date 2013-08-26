@@ -12,7 +12,7 @@ public class LongCompleteOfcHand extends LongOfcHand
 	public LongCompleteOfcHand(LongOfcHand source, OfcCard card) {
 		super(source);
 		if (getBackSize() < BACK_SIZE) {
-			addFront(card);
+			addBack(card);
 		} else if (getMiddleSize() < MIDDLE_SIZE) {
 			addMiddle(card);
 		} else if (getFrontSize() < FRONT_SIZE) {
