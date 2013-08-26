@@ -9,12 +9,12 @@ public class LongCompleteOfcHand2 extends LongOfcHand2
 
 	public LongCompleteOfcHand2(LongOfcHand2 source, OfcCard card) {
 		super(source);
-		if (getBackSize() < BACK_SIZE) {
+		if (!isFrontComplete()) {
 			addFront(card);
-		} else if (getMiddleSize() < MIDDLE_SIZE) {
+		} else if (!isMiddleComplete()) {
 			addMiddle(card);
-		} else if (getFrontSize() < FRONT_SIZE) {
-			addFront(card);
+		} else if (!isBackComplete()) {
+			addBack(card);
 		} 
 		if (!super.isComplete()) {
 			throw new IllegalStateException("Hand too empty.");

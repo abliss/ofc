@@ -203,48 +203,59 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 
 	@Override
 	public void addBack(OfcCard card) {
-		if (getBackSize() >= BACK_SIZE) {
+		if (isBackComplete()) {
 			throw new IllegalStateException("Back already full");
 		}
 		long backMask = addCardToSubhand(getBackMask(), card);
 		board &= ~ (MASK_BACK << OFF_BACK);
 		board |= backMask << OFF_BACK;
-		if (getBackSize() == BACK_SIZE) {
+		if (isBackComplete()) {
 			completeBack();
 		}
 	}
 
 	@Override
 	public void addMiddle(OfcCard card) {
-		if (getMiddleSize() >= MIDDLE_SIZE) {
+		if (isMiddleComplete()) {
 			throw new IllegalStateException("Middle already full");
 		}
 		long middleMask = addCardToSubhand(getMiddleMask(), card);
 		board &= ~ (MASK_MIDDLE << OFF_MIDDLE);
 		board |= middleMask << OFF_MIDDLE;
-		if (getMiddleSize() == MIDDLE_SIZE) {
+		if (isMiddleComplete()) {
 			completeMiddle();
 		}
 	}
 
 	@Override
 	public void addFront(OfcCard card) {
-		if (getFrontSize() >= FRONT_SIZE) {
+		if (isFrontComplete()) {
 			throw new IllegalStateException("Front already full");
 		}
 		long frontMask = addCardToSubhand(getFrontMask(), card);
 		board &= ~ (MASK_FRONT << OFF_FRONT);
 		board |= frontMask << OFF_FRONT;
-		if (getFrontSize() == FRONT_SIZE) {
+		if (isFrontComplete()) {
 			completeFront();
 		}
 	}
 
+	protected boolean isFrontComplete() {
+		return 0 != (board & (MASK_RANK << (OFF_FRONT + OFF_FIRST_RANK +
+											OFF_RANK * (FRONT_SIZE - 1))));
+	}
+	protected boolean isMiddleComplete() {
+		return 0 != (board & (MASK_RANK << (OFF_MIDDLE + OFF_FIRST_RANK +
+											OFF_RANK * (MIDDLE_SIZE - 1))));
+	}
+	protected boolean isBackComplete() {
+		return 0 != (board & (MASK_RANK << (OFF_BACK + OFF_FIRST_RANK +
+											OFF_RANK * (BACK_SIZE - 1))));
+	}
+	
 	@Override
 	public boolean isComplete() {
-		return getFrontSize() == FRONT_SIZE &&
-				getMiddleSize() == MIDDLE_SIZE &&
-				getBackSize() == BACK_SIZE;
+		return isFrontComplete() && isMiddleComplete() && isBackComplete();
 	}
 
 	@Override
