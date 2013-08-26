@@ -123,14 +123,14 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 	private static long addCardToSubhand(long hand, OfcCard card) {
 		if (hand == 0) {
 			// special case for adding the first card to an empty hand
-			hand = (long) (card.getRank() + 1) << OFF_FIRST_RANK;
-			hand |= ((card.getSuit() & MASK_SUIT) << OFF_SUIT);
+			hand = (long) (card.rank + 1) << OFF_FIRST_RANK;
+			hand |= ((card.suit & MASK_SUIT) << OFF_SUIT);
 			return hand;
 		} else {
 			long newHand = 0;
 			// Step 1: does adding this card break the hand's suitedness?
 			int suit = getSuit(hand);
-			if (card.getSuit() != suit) {
+			if (card.suit != suit) {
 				// set the unsuited bit to 1, leave suit as 0
 				newHand |= (MASK_UNSUITED << OFF_UNSUITED);
 			} else {
@@ -141,7 +141,7 @@ public class LongOfcHand2 extends CachedValueOfcHand {
 			}
 			// Step 2: scan for the place to insert this card in rank-order
 			// all higher-rank cards get copied over
-			int rank = card.getRank() + 1;
+			int rank = card.rank + 1;
 			int off = OFF_FIRST_RANK;
 			hand = hand >>> off;
 			while ((hand & MASK_RANK) > rank) {

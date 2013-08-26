@@ -6,17 +6,21 @@ public class OfcCard {
 
 	// One bit should be set, as defined in Deck
 	public final long mask;
+	public final int suit;
+	public final int rank;
 	
 	public OfcCard(long mask) {
 		if (Long.bitCount(mask) != 1) {
 			throw new IllegalArgumentException("Only one bit should be set");
 		}
 		this.mask = mask;
+		this.suit = getSuit();
+		this.rank = getRank();
 	}
 
 	@VisibleForTesting
 	OfcCard(String cardString) {
-		this.mask = Deck.parseCardMask(cardString);
+		this(Deck.parseCardMask(cardString));
 	}
 	
 	// actually this is the index from the right side
