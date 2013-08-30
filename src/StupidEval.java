@@ -49,7 +49,11 @@ public class StupidEval {
 	
 	// OfcHand is dependent on implementation details here, don't mess with them
 	public static long eval(int[] ranks, int[] suits) {
-		if (isFlush(suits)) {
+		return eval(ranks, isFlush(suits));
+	}
+	
+	public static long eval(int[] ranks, boolean isFlush) {
+		if (isFlush) {
 			if (isStraight(ranks)) {
 				if (ranks[0] == Deck.RANK_ACE){
 					return ROYAL_FLUSH;

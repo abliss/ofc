@@ -7,14 +7,14 @@ public class OfcSolver {
 		OfcDeck deck = new OfcDeck();
 		deck.initialize();
 		
-		OfcHand player1 = new LongOfcHand();
+		OfcHand player1 = new LongOfcHand2();
 		
-		OfcHand player2 = new LongOfcHand();
+		OfcHand player2 = new LongOfcHand2();
 //		player1.setHand("/8h4c/AsKsQs", deck);
 //		player2.setHand("Td/JdJh/QdQc", deck);
 	
-		player1.setHand("Kd3hKs/As/JdJc9d7c7d", deck);
-		player2.setHand("QcAd/6d7sKc/AhKhQhJhTh", deck);
+		player1.setHand("Kd3hKs/As2d8d/JdJc9d7c7d", deck);
+		player2.setHand("QcAd/6d7sKc8c/AhKhQhJhTh", deck);
 
 		GameState gs = new GameState(player1, player2, deck);
 		System.out.println(gs);

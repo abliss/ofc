@@ -56,18 +56,14 @@ public class LongOfcHand extends CachedValueOfcHand {
 		return frontSize;
 	}
 
-	@Override
 	public long getBackMask() {
 		return back;
 	}
 	
-	@Override
-
 	public long getMiddleMask() {
 		return middle;
 	}
 	
-	@Override
 	public long getFrontMask() {
 		return front;
 	}
@@ -308,8 +304,9 @@ public class LongOfcHand extends CachedValueOfcHand {
 	}
 	
 	@Override
-	public CompleteOfcHand generateOnlyHand(OfcCard card) {
-		return new LongCompleteOfcHand(this, card);
+    public long generateOnlyHand(OfcCard card) {
+        throw new RuntimeException();
+        //return new LongCompleteOfcHand(this, card);
 	}
 	
 	@Override

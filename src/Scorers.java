@@ -33,7 +33,7 @@ public class Scorers {
 		/**
 		 * Return the value of p1's hand scored against p2
 		 */
-		int score(CompleteOfcHand first, CompleteOfcHand second);
+		int score(long first, long second);
 
 		String getCacheFile();
 
@@ -43,11 +43,11 @@ public class Scorers {
 		/**
 		 * Return 0 if not a FL scorer
 		 */
-		int getFantasylandValue(CompleteOfcHand hand);
-		int getRoyaltyValue(CompleteOfcHand hand);
-		int getFrontValue(CompleteOfcHand hand);
-		int getMiddleValue(CompleteOfcHand hand);
-		int getBackValue(CompleteOfcHand hand);
+		int getFantasylandValue(long hand);
+		int getRoyaltyValue(long hand);
+		int getFrontValue(long hand);
+		int getMiddleValue(long hand);
+		int getBackValue(long hand);
 	}
 	
 	private static abstract class AbstractScorer implements Scorer {
@@ -58,10 +58,11 @@ public class Scorers {
 		}
 
 		public final int getBackValue(long hand) {
+
 			// Stupid integer division hack to zero out all the insignificant
 			// digits so we can use a map to look up
 			// royalty values
-			long rank = hand.getBackRank() / StupidEval.ONE_PAIR
+			long rank = LongCompleteOfcHand2.getBackRank(hand) / StupidEval.ONE_PAIR
 					* StupidEval.ONE_PAIR;
 			
 			if (rank == StupidEval.STRAIGHT) {
@@ -85,7 +86,7 @@ public class Scorers {
 			// Stupid integer division hack to zero out all the insignificant
 			// digits so we can use a map to look up
 			// royalty values
-			long rank = hand.getMiddleRank() / StupidEval.ONE_PAIR
+			long rank = LongCompleteOfcHand2.getMiddleRank(hand) / StupidEval.ONE_PAIR
 					* StupidEval.ONE_PAIR;
 			if (rank == StupidEval.STRAIGHT) {
 				return 4;
@@ -104,8 +105,8 @@ public class Scorers {
 			return 0;
 		}
 
-		public final int getFrontValue(CompleteOfcHand hand) {
-			long rank = hand.getFrontRank();
+		public final int getFrontValue(long hand) {
+			long rank = LongCompleteOfcHand2.getFrontRank(hand);
 			if (rank >= StupidEval.TRIPS) {
 				rank -= StupidEval.TRIPS;
 				// StupidEval implementation is to leave only the rank of the
@@ -127,38 +128,38 @@ public class Scorers {
 			return 0;
 		}
 		
-		public final int getRoyaltyValue(CompleteOfcHand hand) {
-			if (hand.isFouled()) {
+		public final int getRoyaltyValue(long hand) {
+			if (LongCompleteOfcHand2.isFouled(hand)) {
 				return 0;
 			}
 
 			return getBackValue(hand) + getMiddleValue(hand) + getFrontValue(hand);
 		}
 
-		protected final boolean isFantasyland(CompleteOfcHand hand) {
-			return !hand.isFouled() && hand.getFrontRank() >= StupidEval.FANTASYLAND_THRESHOLD;
+		protected final boolean isFantasyland(long hand) {
+			return !LongCompleteOfcHand2.isFouled(hand) && LongCompleteOfcHand2.getFrontRank(hand) >= StupidEval.FANTASYLAND_THRESHOLD;
 		}
 		
-		public final int score(CompleteOfcHand first, CompleteOfcHand second) {
-			if (first.isFouled()) {
-				if (second.isFouled()) {
+		public final int score(long first, long second) {
+			if (LongCompleteOfcHand2.isFouled(first)) {
+				if (LongCompleteOfcHand2.isFouled(second)) {
 					return 0;
 				}
 				return SCOOPED_VALUE - getRoyaltyValue(second)
 						- getFantasylandValue(second);
 			}
-			if (second.isFouled()) {
+			if (LongCompleteOfcHand2.isFouled(second)) {
 				return SCOOPING_VALUE + getRoyaltyValue(first)
 						+ getFantasylandValue(first);
 			}
 			int wins = 0;
-			if (first.getBackRank() > second.getBackRank()) {
+			if (LongCompleteOfcHand2.getBackRank(first) > LongCompleteOfcHand2.getBackRank(second)) {
 				wins++;
 			}
-			if (first.getMiddleRank() > second.getMiddleRank()) {
+			if (LongCompleteOfcHand2.getMiddleRank(first) > LongCompleteOfcHand2.getMiddleRank(second)) {
 				wins++;
 			}
-			if (first.getFrontRank() > second.getFrontRank()) {
+			if (LongCompleteOfcHand2.getFrontRank(first) > LongCompleteOfcHand2.getFrontRank(second)) {
 				wins++;
 			}
 
@@ -187,7 +188,7 @@ public class Scorers {
 
 	static class OldScorer extends AbstractScorer {
 		@Override
-		public int getFantasylandValue(CompleteOfcHand hand) {
+		public int getFantasylandValue(long hand) {
 			return 0;
 		}
 
@@ -199,7 +200,7 @@ public class Scorers {
 
 	static final class OldFantasylandScorer extends OldScorer {
 		@Override
-		public int getFantasylandValue(CompleteOfcHand hand) {
+		public int getFantasylandValue(long hand) {
 			if (isFantasyland(hand)) {
 				return FANTASYLAND_VALUE;
 			}
@@ -214,7 +215,7 @@ public class Scorers {
 
 	static class NewScorer extends AbstractScorer {
 		@Override
-		public int getFantasylandValue(CompleteOfcHand hand) {
+		public int getFantasylandValue(long hand) {
 			return 0;
 		}
 
@@ -226,7 +227,7 @@ public class Scorers {
 
 	static final class NewFantasylandScorer extends NewScorer {
 		@Override
-		public int getFantasylandValue(CompleteOfcHand hand) {
+		public int getFantasylandValue(long hand) {
 			if (isFantasyland(hand)) {
 				return FANTASYLAND_VALUE;
 			}

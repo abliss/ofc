@@ -144,10 +144,10 @@ public class GameState {
 			throw new IllegalStateException("Player 1 must be on same or previous street as player 2");
 		}
 		
-		// Don't permit any dead cards.  We'd like game states to be normalized so that any 2 of {player1, player2, deck}
+		// Don't permit any dead cards.	 We'd like game states to be normalized so that any 2 of {player1, player2, deck}
 		// define the state.
-		if (FULL_DECK_MASK != (player1.getBackMask() ^ player1.getMiddleMask() ^ player1.getFrontMask() ^
-				player2.getBackMask() ^ player2.getMiddleMask() ^ player2.getFrontMask() ^ deck.getMask())) {
+		if (OfcDeck.FULL_SIZE != (player1.getBackSize() + player1.getMiddleSize() + player1.getFrontSize() +
+				player2.getBackSize() + player2.getMiddleSize() + player2.getFrontSize() + deck.getSize())) {
 			throw new IllegalStateException("Hands + deck != full deck");
 		}
 	}
@@ -302,16 +302,16 @@ public class GameState {
 		int count = 0;
 		int[] sums = new int[scorers.length];
 		OfcCard[] cards =  CardSetUtils.asCards(deck.getMask());
-		CompleteOfcHand[] p2Hands = new CompleteOfcHand[cards.length];
+		long[] p2Hands = new long[cards.length];
 		for (int i = cards.length - 1; i >= 0; i--) {
 			p2Hands[i] = player2.generateOnlyHand(cards[i]);
 		}
 		for (int i = cards.length - 1; i >= 0; i--) {
 			OfcCard p1Card = cards[i];
-			CompleteOfcHand p1Hand = player1.generateOnlyHand(p1Card);
+			long p1Hand = player1.generateOnlyHand(p1Card);
 			for (int j = cards.length - 1; j >= 0; j--) {
 				if (j != i) {
-					CompleteOfcHand p2Hand = p2Hands[j];
+					long p2Hand = p2Hands[j];
 					count++;
 					for (int k = 0; k < scorers.length; k++) {
 						sums[k] += scorers[k].score(p1Hand, p2Hand);
@@ -388,13 +388,14 @@ public class GameState {
 		return values;
 	}
 		
-	private String toFileString() {
+	@VisibleForTesting
+	String toFileString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getStreet());
-		sb.append(" ");
 		sb.append(player1.toKeyString());
 		sb.append(" ");
 		sb.append(player2.toKeyString());
+		sb.append(" ");
+		sb.append(deck.toString().replaceAll(" ", "-"));
 		
 		return sb.toString();
 	}
@@ -403,22 +404,16 @@ public class GameState {
 	static GameState fromFileString(String fileString) {
 		String[] splitString = fileString.split(" ");
 
-		OfcHand p1 = LongOfcHand.fromKeyString(splitString[1]);
-		OfcHand p2 = LongOfcHand.fromKeyString(splitString[2]);
-		
-		return new GameState(p1, p2, new OfcDeck(deriveDeck(p1, p2)));
+		OfcHand p1 = LongOfcHand.fromKeyString(splitString[0]);
+		OfcHand p2 = LongOfcHand.fromKeyString(splitString[1]);
+		OfcDeck deck = OfcDeck.fromString(splitString[2].replaceAll("-", " "));
+		return new GameState(p1, p2, deck);
 	}
 	
 	@VisibleForTesting
 	static double getValueFromFileString(String fileString) {
 		String[] splitString = fileString.split(" ");
 		return Double.parseDouble(splitString[3]);
-	}
-	
-	@VisibleForTesting
-	static long deriveDeck(OfcHand p1, OfcHand p2) {
-		return ~(~FULL_DECK_MASK | p1.getFrontMask() | p1.getMiddleMask() | p1.getBackMask()
-					| p2.getFrontMask() | p2.getMiddleMask() | p2.getBackMask());
 	}
 	
 	public double getStreet() {

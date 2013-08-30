@@ -38,7 +38,7 @@ public interface OfcHand {
 	 * location.
 	 * @throw IllegalStateException if there is more than one place for the card to go.
 	 */
-	CompleteOfcHand generateOnlyHand(OfcCard card);
+    long generateOnlyHand(OfcCard card);
 
 	void addBack(OfcCard card);
 	void addMiddle(OfcCard card);
@@ -59,11 +59,6 @@ public interface OfcHand {
 	long getMiddleRank();
 	long getBackRank();
 
-	// These really are just for LongOfcHand and don't belong in the interface
-	long getBackMask();
-	long getMiddleMask();
-	long getFrontMask();
-	
 	boolean isComplete();
 
 	// use for pruning the search space
