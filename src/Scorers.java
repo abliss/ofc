@@ -31,9 +31,10 @@ public class Scorers {
 
 	public interface Scorer {
 		/**
-		 * Return the value of p1's hand scored against p2
+		 * Score a square matrix of final hands. Evaluates all possible pairs
+		 * except the diagonal; returns the sum of first against second.
 		 */
-		int score(CompleteOfcHand first, CompleteOfcHand second);
+		int score(CompleteOfcHand[] first, CompleteOfcHand[] second);
 
 		String getCacheFile();
 
@@ -156,49 +157,55 @@ public class Scorers {
 			return !hand.isFouled() && hand.getFrontRank() >= StupidEval.FANTASYLAND_THRESHOLD;
 		}
 		
-		public final int score(CompleteOfcHand first, CompleteOfcHand second) {
-			if (first.isFouled()) {
-				if (second.isFouled()) {
-					return 0;
+		public final int score(CompleteOfcHand[] first, CompleteOfcHand[] second) {
+			int total = 0;
+			for (int i = first.length - 1; i >= 0; i--) {
+				for (int j = first.length - 1; j >= 0; j--) {
+					if (i != j) {
+						if (first[i].isFouled()) {
+							if (!second[j].isFouled()) {
+								total += SCOOPED_VALUE - getRoyaltyValue(second[j])
+									- getFantasylandValue(second[j]);
+							}
+						} else if (second[j].isFouled()) {
+							total += SCOOPING_VALUE + getRoyaltyValue(first[i])
+								+ getFantasylandValue(first[i]);
+						} else {
+							int wins = 0;
+							if (first[i].getBackRank() > second[j].getBackRank()) {
+								wins++;
+							}
+							if (first[i].getMiddleRank() > second[j].getMiddleRank()) {
+								wins++;
+							}
+							if (first[i].getFrontRank() > second[j].getFrontRank()) {
+								wins++;
+							}
+
+							int score = getRoyaltyValue(first[i]) - getRoyaltyValue(second[j]);
+							int flValue = getFantasylandValue(first[i]) - getFantasylandValue(second[j]);
+							switch (wins) {
+							case 0:
+								score += SCOOPED_VALUE;
+								break;
+							case 1:
+								score -= 1;
+								break;
+							case 2:
+								score += 1;
+								break;
+							case 3:
+								score += SCOOPING_VALUE;
+								break;
+							default:
+								throw new IllegalStateException("wtf");
+							}
+							total += score + flValue;
+						}
+					}
 				}
-				return SCOOPED_VALUE - getRoyaltyValue(second)
-						- getFantasylandValue(second);
 			}
-			if (second.isFouled()) {
-				return SCOOPING_VALUE + getRoyaltyValue(first)
-						+ getFantasylandValue(first);
-			}
-			int wins = 0;
-			if (first.getBackRank() > second.getBackRank()) {
-				wins++;
-			}
-			if (first.getMiddleRank() > second.getMiddleRank()) {
-				wins++;
-			}
-			if (first.getFrontRank() > second.getFrontRank()) {
-				wins++;
-			}
-
-			int score = getRoyaltyValue(first) - getRoyaltyValue(second);
-			int flValue = getFantasylandValue(first) - getFantasylandValue(second);
-			switch (wins) {
-			case 0:
-				score += SCOOPED_VALUE;
-				break;
-			case 1:
-				score -= 1;
-				break;
-			case 2:
-				score += 1;
-				break;
-			case 3:
-				score += SCOOPING_VALUE;
-				break;
-			default:
-				throw new IllegalStateException("wtf");
-			}
-			return score + flValue;
-
+			return total;
 		}
 	}
 
