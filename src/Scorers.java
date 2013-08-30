@@ -51,17 +51,13 @@ public class Scorers {
 	}
 	
 	private static abstract class AbstractScorer implements Scorer {
-		protected abstract Map<Long, Integer> getBackRoyaltyMap();
-
 		// NOTE: actually never mind, these must be the same. Don't mess with
 		// this
 		public String getKey() {
 			return getCacheFile();
 		}
 
-		public final int getBackValue(CompleteOfcHand hand) {
-			Map<Long, Integer> backRoyaltyMap = getBackRoyaltyMap();
-
+		public final int getBackValue(long hand) {
 			// Stupid integer division hack to zero out all the insignificant
 			// digits so we can use a map to look up
 			// royalty values
@@ -82,17 +78,10 @@ public class Scorers {
 				return 25;
 			}
 			
-			/*
-			if (backRoyaltyMap.containsKey(rank)) {
-				return backRoyaltyMap.get(rank);
-			}
-			*/
 			return 0;
 		}
 		
-		public final int getMiddleValue(CompleteOfcHand hand) {
-			Map<Long, Integer> backRoyaltyMap = getBackRoyaltyMap();
-
+		public final int getMiddleValue(long hand) {
 			// Stupid integer division hack to zero out all the insignificant
 			// digits so we can use a map to look up
 			// royalty values
@@ -112,12 +101,6 @@ public class Scorers {
 				return 50;
 			}
 
-			/*
-			 * if (backRoyaltyMap.containsKey(rank)) {
-			 
-				return backRoyaltyMap.get(rank) * 2;
-			}
-			*/
 			return 0;
 		}
 
@@ -203,10 +186,6 @@ public class Scorers {
 	}
 
 	static class OldScorer extends AbstractScorer {
-		protected Map<Long, Integer> getBackRoyaltyMap() {
-			return OLD_BACK_ROYALTY_MAP;
-		}
-
 		@Override
 		public int getFantasylandValue(CompleteOfcHand hand) {
 			return 0;
@@ -234,10 +213,6 @@ public class Scorers {
 	}
 
 	static class NewScorer extends AbstractScorer {
-		protected Map<Long, Integer> getBackRoyaltyMap() {
-			return NEW_BACK_ROYALTY_MAP;
-		}
-
 		@Override
 		public int getFantasylandValue(CompleteOfcHand hand) {
 			return 0;
