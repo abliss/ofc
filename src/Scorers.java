@@ -158,49 +158,60 @@ public class Scorers {
 		}
 		
 		public final int score(CompleteOfcHand[] first, CompleteOfcHand[] second) {
+			int numHands = first.length;
+			if (numHands != second.length) {
+				throw new IllegalArgumentException("Need square matrix!");
+			}
 			int total = 0;
-			for (int i = first.length - 1; i >= 0; i--) {
-				for (int j = first.length - 1; j >= 0; j--) {
-					if (i != j) {
-						if (first[i].isFouled()) {
+			for (int i = numHands - 1; i >= 0; i--) {
+				if (first[i].isFouled()) {
+					for (int j = numHands - 1; j >= 0; j--) {
+						if (i != j) {
 							if (!second[j].isFouled()) {
 								total += SCOOPED_VALUE - getRoyaltyValue(second[j])
 									- getFantasylandValue(second[j]);
 							}
-						} else if (second[j].isFouled()) {
-							total += SCOOPING_VALUE + getRoyaltyValue(first[i])
-								+ getFantasylandValue(first[i]);
-						} else {
-							int wins = 0;
-							if (first[i].getBackRank() > second[j].getBackRank()) {
-								wins++;
-							}
-							if (first[i].getMiddleRank() > second[j].getMiddleRank()) {
-								wins++;
-							}
-							if (first[i].getFrontRank() > second[j].getFrontRank()) {
-								wins++;
-							}
+						}
+					}
+				} else {
+					total += (numHands - 1) * 
+						(getRoyaltyValue(first[i]) + getFantasylandValue(first[i]));
+					for (int j = numHands - 1; j >= 0; j--) {
+						if (i != j) {
+							if (second[j].isFouled()) {
+								total += SCOOPING_VALUE;
+							} else {
+								total -= getRoyaltyValue(second[j]);
+								total -= getFantasylandValue(second[j]);
 
-							int score = getRoyaltyValue(first[i]) - getRoyaltyValue(second[j]);
-							int flValue = getFantasylandValue(first[i]) - getFantasylandValue(second[j]);
-							switch (wins) {
-							case 0:
-								score += SCOOPED_VALUE;
-								break;
-							case 1:
-								score -= 1;
-								break;
-							case 2:
-								score += 1;
-								break;
-							case 3:
-								score += SCOOPING_VALUE;
-								break;
-							default:
-								throw new IllegalStateException("wtf");
+								int wins = 0;
+								if (first[i].getBackRank() > second[j].getBackRank()) {
+									wins++;
+								}
+								if (first[i].getMiddleRank() > second[j].getMiddleRank()) {
+									wins++;
+								}
+								if (first[i].getFrontRank() > second[j].getFrontRank()) {
+									wins++;
+								}
+
+								switch (wins) {
+								case 0:
+									total += SCOOPED_VALUE;
+									break;
+								case 1:
+									total -= 1;
+									break;
+								case 2:
+									total += 1;
+									break;
+								case 3:
+									total += SCOOPING_VALUE;
+									break;
+								default:
+									throw new IllegalStateException("wtf");
+								}
 							}
-							total += score + flValue;
 						}
 					}
 				}
