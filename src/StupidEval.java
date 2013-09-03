@@ -28,7 +28,25 @@ public class StupidEval {
 	public static final long FANTASYLAND_THRESHOLD =
 		eval3(new int[] {Deck.RANK_QUEEN, Deck.RANK_QUEEN, Deck.RANK_2});
 	
+	// 3-card ranks for trips and the lowest possible pair, starting at deuce
+	public static final long[] FRONT_PAIR_RANKS = new long[13];
+	public static final long[] FRONT_TRIP_RANKS = new long[13];
+	static {
+		int[] ranks = new int[3];
+		for (int rank = 0; rank < 13; rank++) {
+			ranks[0] = ranks[1] = ranks[2] = rank;
+			FRONT_TRIP_RANKS[rank] = eval3(ranks);
+			if (rank == 0) {
+				ranks[0] = 1;
+			} else {
+				ranks[2] = 0;
+			}
+			FRONT_PAIR_RANKS[rank] = eval3(ranks);
+		}
+	}
+	
 	// OfcHand is dependent on implementation details here, don't mess with them
+	// TODO(abliss): still true?
 	public static long eval3(int[] ranks) {
 		if (ranks.length != 3 && ranks[3] != 0) {
 			throw new IllegalArgumentException("Are you sure you only have 3 cards?");

@@ -1,5 +1,5 @@
 
-public class NewFantasylandScorerTest extends FantasylandTestCase {
+public class NewFantasylandScorerTest extends ScorerTestCase {
 
 	public NewFantasylandScorerTest(String name) {
 		super(name);
