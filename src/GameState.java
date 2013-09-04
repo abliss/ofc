@@ -441,8 +441,6 @@ public class GameState {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		GameState other = (GameState) obj;
 		if (deck == null) {
 			if (other.deck != null)

@@ -65,8 +65,6 @@ public class OfcDeck {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		OfcDeck other = (OfcDeck) obj;
 		if (cardMask != other.cardMask)
 			return false;
