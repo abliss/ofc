@@ -3,6 +3,10 @@
  * street, and allows these to be queried in efficient ways.
  */
 public interface OfcHandMatrix {
+	// subhand indices
+	public static final int FRONT = 0;
+	public static final int MIDDLE = 1;
+	public static final int BACK = 2;
 	/**
 	 * How many times does the given player's hand reach at least the given
 	 * rank?
